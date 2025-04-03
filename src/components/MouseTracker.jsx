@@ -26,11 +26,15 @@ const MouseTracker = ({ children, offset = { x: 0, y: 0 } }) => {
       className="mouse-tracker"
       ref={element}
       style={{
-        position: "absolute",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        pointerEvents: "none",
+        backgroundColor: "white",
+        padding: "2px 7px",
+        borderRadius: "3px",
+        whiteSpace: "nowrap",
         visibility: "hidden",
-        backgroundColor: "red", // Add this for debugging
-        width: "50px", // Optional
-        height: "50px", // Optional
       }}
     >
       {children}

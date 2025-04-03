@@ -1,11 +1,11 @@
-import './App.css';
+import './PageNotFound.css';
+import WaterDropGrid from '../components/DotGrid';
 
 function PageNotFound() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>Not Found</p>
-      </header>
+    <div className="Layer0">
+        <WaterDropGrid/>
+        <h1>404 - Page Not Found</h1>
     </div>
   );
 }
