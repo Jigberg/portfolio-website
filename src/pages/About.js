@@ -1,15 +1,16 @@
-import logo from "../logo.svg";
+import MouseTracker from "../components/MouseTracker";
 import "./About.css";
-import { useRef, useEffect, useState } from "react";
 
-const [paddlePos, setPaddlePos] = useState(50); 
-
-function About() {
+const Example = () => {
   return (
-    <canvas
-
-    />
+    <div className="About">
+      <header className="App-header">
+        <MouseTracker offset={{ x: 10, y: 10 }}>I TRACK U 👀</MouseTracker>;
+        <h1>Mouse Tracker Example</h1>
+        <p>Move your mouse around to see the effect!</p>
+      </header>
+    </div>
   );
-}
+};
 
-export default About;
+export default Example;
