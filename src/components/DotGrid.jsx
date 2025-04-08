@@ -20,7 +20,15 @@ const WaterDropGrid = () => {
 
 const DotGrid = () => {
   const [gridDimensions, setGridDimensions] = useState({ rows: 0, cols: 0 });
-  const dotSize = 20; // Size of each dot (in pixels, including padding)
+  const dotSize = 16; // Size of each dot (in pixels, including padding)
+  const [indexCount, setIndexCount] = useState(0);
+  const colorArray = [
+    "rgb(63, 70, 168)",
+    "rgb(177, 78, 136)",
+    "rgb(239, 68, 68)",
+    "rgb(75, 182, 173)",
+    "rgb(65, 173, 65)",
+  ]; // Ar
 
   useEffect(() => {
     // Calculate the number of rows and columns based on the parent container's size
@@ -43,8 +51,6 @@ const DotGrid = () => {
 
   const handleDotClick = (e) => {
     const index = e.currentTarget.dataset.index; // Get the index of the clicked dot
-
-    // Trigger the bounce animation for the clicked dot and its neighbors
     anime({
       targets: ".dot-point",
       translateY: [
@@ -55,8 +61,27 @@ const DotGrid = () => {
         grid: [gridDimensions.cols, gridDimensions.rows], // Define the grid dimensions
         from: index, // Start the animation from the clicked dot
       }),
-      
     });
+  };
+
+  const handleDotClickRight = (e) => {
+    e.preventDefault();
+    const index = e.currentTarget.dataset.index; // Get the index of the clicked dot
+    anime({
+      targets: ".dot-point",
+      backgroundColor: [
+        { value: "rgb(61, 61, 61)", duration: 400 }, // Change to initial color
+        { value: colorArray[indexCount], duration: 800 }, // Change to initial color
+      ],
+      delay: anime.stagger(100, {
+        grid: [gridDimensions.cols, gridDimensions.rows], // Define the grid dimensions
+        from: index, // Start the animation from the clicked dot
+      }),
+    });
+    setIndexCount(indexCount + 1); // Increment the index count
+    if (indexCount >= colorArray.length-1) {
+      setIndexCount(0); // Reset the index count if it exceeds the array length
+    }
   };
 
   const dots = [];
@@ -73,22 +98,28 @@ const DotGrid = () => {
             transition: "background-color 0s ease-in-out",
             backgroundColor: "transparent",
             display: "flex", // Add flexbox to center the inner div
-    justifyContent: "center", // Center horizontally
-    alignItems: "center",
+            justifyContent: "center", // Center horizontally
+            alignItems: "center",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#475569")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "#475569")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "transparent")
+          }
           onClick={handleDotClick} // Attach the click handler
+          onContextMenu={handleDotClickRight} // Prevent right-click context menu
           data-index={index}
           key={`${i}-${j}`}
         >
           <div
             className="dot-point"
             style={{
-              height: `${dotSize *0.5}px`,
-              width: `${dotSize*0.5}px`,
+              height: `${dotSize * 0.5}px`,
+              width: `${dotSize * 0.5}px`,
               borderRadius: "9999px",
-              background: "linear-gradient(to bottom,rgb(92, 92, 92), #9CA3AF)",
+              /*background: "linear-gradient(to bottom,rgb(92, 92, 92), #9CA3AF)",*/
+              backgroundColor: "rgb(92, 92, 92)", // Initial color
               opacity: 0.5,
               transition: "background-color 0.2s ease-in-out",
             }}
