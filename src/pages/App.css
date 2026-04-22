@@ -15,14 +15,41 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #0f0f11;
   min-height: 100vh;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  overflow: hidden;
+}
+
+.canvas-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3000px;
+  height: 2000px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.text-content {
+  position: relative;
+  z-index: 1;
+}
+
+.App-header canvas {
+  position: absolute !important;
+  bottom: 0;
+  left: 0;
+  width: 300px;  /* adjust size as needed */
+  height: 300px; /* adjust size as needed */
 }
 
 .App-link {
