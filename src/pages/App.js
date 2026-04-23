@@ -1,4 +1,7 @@
 import logo from "../logo.svg";
+import linkedinIcon from "../linkedinIcon.svg";
+import githubIcon from "../githubIcon.svg";
+import mailIcon from "../mailIcon.svg";
 import planet from "../planetIMG.png";
 import { Suspense, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -18,7 +21,8 @@ function ModelEarth() {
 
   useFrame(() => {
     if (ref.current) {
-      ref.current.rotation.y = (ref.current.rotation.y + 0.0005) % (Math.PI * 2);
+      ref.current.rotation.y =
+        (ref.current.rotation.y + 0.0005) % (Math.PI * 2);
     }
   });
 
@@ -59,7 +63,7 @@ function ModelRat() {
 
 function ModelShip() {
   //https://skfb.ly/JIPA
-  const { scene } = useGLTF("/ship.glb");
+  const { scene } = useGLTF("/testX.glb");
   const ref = useRef();
 
   const clonedScene = useMemo(() => SkeletonUtils.clone(scene), [scene]);
@@ -78,6 +82,57 @@ function ModelShip() {
       scale={0.3}
       rotation={[0.4, 2, -0.4]}
       position={[2.4, -3.0, -5]}
+    />
+  );
+}
+
+function ModelRing() {
+  //https://skfb.ly/JIPA
+  const { scene } = useGLTF("/rockRing.glb");
+  const ref = useRef();
+
+  const clonedScene = useMemo(() => SkeletonUtils.clone(scene), [scene]);
+
+  useFrame(() => {
+    if (ref.current) {
+      //ref.current.position.y = -1.0 + Math.sin(Date.now() * 0.001) * 0.03;
+      ref.current.rotation.y = (ref.current.rotation.y + 0.002) % (Math.PI * 2);
+    }
+  });
+
+  return (
+    <primitive
+      ref={ref}
+      object={clonedScene}
+      scale={0.1}
+      rotation={[0, 0, 0]}
+      //rotation={[0.6, 1.3, -0.8]}
+      position={[-3.4, -2.0, -6]}
+    />
+  );
+}
+
+function ModelRockPlanet() {
+  //https://skfb.ly/JIPA
+  const { scene } = useGLTF("/rockPlanet.glb");
+  const ref = useRef();
+
+  const clonedScene = useMemo(() => SkeletonUtils.clone(scene), [scene]);
+
+  useFrame(() => {
+    if (ref.current) {
+      //ref.current.position.y = -1.0 + Math.sin(Date.now() * 0.001) * 0.03;
+      ref.current.rotation.y = (ref.current.rotation.y + 0.001) % (Math.PI * 2);
+    }
+  });
+
+  return (
+    <primitive
+      ref={ref}
+      object={clonedScene}
+      scale={0.1}
+      rotation={[0.0, 0.1, -0.4]}
+      position={[-3.4, -2.0, -6]}
     />
   );
 }
@@ -101,6 +156,40 @@ function App() {
             Learn React
           </a>
         </div>
+        <div className="bottom-content">
+          <div className="contact-info">
+            <a
+              className="linkIcon"
+              href="https://linkedin.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
+            </a>
+            <a
+              className="linkIcon"
+              href="https://github.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src={githubIcon} alt="GitHub" className="social-icon" />
+            </a>
+            <a
+              className="linkIcon"
+              href="https://mail.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src={mailIcon} alt="Mail" className="social-icon" />
+            </a>
+          </div>
+
+          <div className="copyright">
+            <p style={{ margin: 0 }}>
+              © {new Date().getFullYear()} Lukas Jigberg
+            </p>
+          </div>
+        </div>
         <div className="canvas-container">
           <Canvas
             camera={{ position: [0, 0, 0], fov: 75 }}
@@ -110,7 +199,9 @@ function App() {
               <ModelEarth />
               <ModelRat />
               <ModelShip />
-              <pointLight position={[1.4, 0, 1]} intensity={50} />
+              <ModelRing />
+              <ModelRockPlanet />
+              <pointLight position={[1, 0, 1]} intensity={60} />
               <ambientLight intensity={0.1} />
               <Stars
                 radius={100}
