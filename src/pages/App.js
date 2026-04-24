@@ -1,7 +1,7 @@
 import logo from "../logo.svg";
-import linkedinIcon from "../linkedinIcon.svg";
-import githubIcon from "../githubIcon.svg";
-import mailIcon from "../mailIcon.svg";
+import linkedinIcon from "../Subtract(1).svg";
+import githubIcon from "../Subtract(2).svg";
+import mailIcon from "../Subtract.svg";
 import planet from "../planetIMG.png";
 import { Suspense, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -9,6 +9,7 @@ import { useGLTF, OrbitControls, Environment, Stars } from "@react-three/drei";
 import "./App.css";
 import { useMemo } from "react";
 import { SkeletonUtils } from "three-stdlib";
+import { useEffect, useState } from "react";
 
 useGLTF.preload("/earth(5).glb");
 
@@ -138,23 +139,48 @@ function ModelRockPlanet() {
 }
 
 function App() {
+  const [text, setText] = useState("Welcome");
+
+  useEffect(() => {
+  const hasVisited = localStorage.getItem("visited");
+
+  const responses = [
+    ", good to see you!",
+    ", glad you're here!",
+    ", long time no see!",
+    ", glad you're back!",
+    ", hey again!"
+  ];
+
+  if (hasVisited) {
+    const random =
+      responses[Math.floor(Math.random() * responses.length)];
+
+    setText(random);
+  } else {
+    setText("");
+    localStorage.setItem("visited", "true");
+  }
+}, []);
+
   return (
     <div className="App">
       <header className="App-header">
         <div className="text-content">
-          <img src={logo} className="App-logo" alt="logo" />
-
-          <p>
-            Edid <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
+          <div className="welcome">
+            <h1>
+              <h1>
+                <span className="font-main">Welcome</span>
+                <span className="font-alt">{text}</span>
+              </h1>
+            </h1>
+          </div>
+          <div className="description">asd</div>
+          <div className="buttons">
+            <p>JavaScript</p>
+            <p>React</p>
+            <p>Node.js</p>
+          </div>
         </div>
         <div className="bottom-content">
           <div className="contact-info">
@@ -207,7 +233,7 @@ function App() {
                 radius={100}
                 depth={50}
                 count={5000}
-                factor={4}
+                factor={5}
                 saturation={0}
                 fade
               />
