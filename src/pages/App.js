@@ -20,6 +20,30 @@ function ModelEarth() {
 
   const clonedScene = useMemo(() => SkeletonUtils.clone(scene), [scene]);
 
+  {
+    /*useEffect(() => {
+  clonedScene.traverse((child) => {
+    if (child.isMesh && child.material) {
+      child.material.onBeforeCompile = (shader) => {
+        shader.fragmentShader = shader.fragmentShader.replace(
+          "#include <dithering_fragment>",
+          `
+          #include <dithering_fragment>
+
+          float depth = gl_FragCoord.z / gl_FragCoord.w;
+          float fade = smoothstep(10.0, 40.0, depth);
+
+          vec3 gray = vec3(dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114)));
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, gray, fade * 0.7);
+          gl_FragColor.rgb *= (1.0 - fade * 0.3);
+          `
+        );
+      };
+    }
+  });
+}, [clonedScene]);`*/
+  }
+
   useFrame(() => {
     if (ref.current) {
       ref.current.rotation.y =
@@ -33,7 +57,7 @@ function ModelEarth() {
       object={clonedScene}
       scale={0.02}
       rotation={[0.0, 0, 0.2]}
-      position={[-3.4, 1.4, -9]}
+      position={[-11, 6, -20]}
     />
   );
 }
@@ -57,7 +81,7 @@ function ModelRat() {
       object={clonedScene}
       scale={0.2}
       rotation={[0.7, 0, 0.2]}
-      position={[2, 1.5, -5]}
+      position={[2, 1.5, -7]}
     />
   );
 }
@@ -71,7 +95,7 @@ function ModelShip() {
 
   useFrame(() => {
     if (ref.current) {
-      ref.current.position.y = -1.0 + Math.sin(Date.now() * 0.001) * 0.03;
+      ref.current.position.y = -1.5 + Math.sin(Date.now() * 0.001) * 0.03;
       //ref.current.rotation.y = (ref.current.rotation.y + 0.005) % (Math.PI * 2);
     }
   });
@@ -82,7 +106,7 @@ function ModelShip() {
       object={clonedScene}
       scale={0.3}
       rotation={[0.4, 2, -0.4]}
-      position={[2.4, -3.0, -5]}
+      position={[3, -1.5, -5]}
     />
   );
 }
@@ -140,28 +164,96 @@ function ModelRockPlanet() {
 
 function App() {
   const [text, setText] = useState("Welcome");
+  const [altFont, setAltFont] = useState(false);
 
   useEffect(() => {
-  const hasVisited = localStorage.getItem("visited");
+    const interval = setInterval(() => {
+      // trigger just before the pop
+      setTimeout(() => {
+        setAltFont(true);
 
-  const responses = [
-    ", good to see you!",
-    ", glad you're here!",
-    ", long time no see!",
-    ", glad you're back!",
-    ", hey again!"
-  ];
+        // revert back quickly after pop
+        setTimeout(() => setAltFont(false), 200);
+      }, 7680); // 96% of 8000ms
+    }, 8000);
 
-  if (hasVisited) {
-    const random =
-      responses[Math.floor(Math.random() * responses.length)];
+    return () => clearInterval(interval);
+  }, []);
 
-    setText(random);
-  } else {
-    setText("");
-    localStorage.setItem("visited", "true");
-  }
-}, []);
+  useEffect(() => {
+    const hasVisited = localStorage.getItem("visited");
+
+    const responses = [
+      ", good to see you!",
+      ", glad you're here!",
+      ", long time no see!",
+      ", glad you're back!",
+      ", hey again!",
+    ];
+
+    if (hasVisited) {
+      const random = responses[Math.floor(Math.random() * responses.length)];
+
+      setText(random);
+    } else {
+      setText("");
+      localStorage.setItem("visited", "true");
+    }
+  }, []);
+
+  const words = ["Welcome", "Developer", "UI Designer", "Creator"];
+
+const [displayed, setDisplayed] = useState("");
+const [wordIndex, setWordIndex] = useState(0);
+
+  useEffect(() => {
+  let timeout;
+  let interval;
+
+  const typeWord = (word) => {
+    let i = 0;
+
+    interval = setInterval(() => {
+      setDisplayed(word.slice(0, i + 1));
+      i++;
+
+      if (i === word.length) {
+        clearInterval(interval);
+
+        // pause before deleting
+        timeout = setTimeout(() => deleteWord(word), 3000);
+      }
+    }, 120); // typing speed
+  };
+
+  const deleteWord = (word) => {
+    let i = word.length;
+
+    interval = setInterval(() => {
+      setDisplayed(word.slice(0, i - 1));
+      i--;
+
+      if (i === 0) {
+        clearInterval(interval);
+
+        const nextIndex = (wordIndex + 1) % words.length;
+        setWordIndex(nextIndex);
+
+        timeout = setTimeout(() => typeWord(words[nextIndex]), 400);
+      }
+    }, 120); // delete speed (faster than typing)
+  };
+
+  // initial delay before first word starts
+  timeout = setTimeout(() => {
+    typeWord(words[wordIndex]);
+  }, 1000);
+
+  return () => {
+    clearTimeout(timeout);
+    clearInterval(interval);
+  };
+}, [wordIndex]);
 
   return (
     <div className="App">
@@ -169,13 +261,17 @@ function App() {
         <div className="text-content">
           <div className="welcome">
             <h1>
-              <h1>
-                <span className="font-main">Welcome</span>
-                <span className="font-alt">{text}</span>
-              </h1>
+              <span className="font-main">
+                {displayed}
+                <span className="underscore">_</span>
+              </span>
             </h1>
           </div>
-          <div className="description">asd</div>
+          <div className="description">
+            <p style={{ color: "#4288c2" }}>Developer</p>
+            <p style={{ color: "#b34cb3" }}>UI Designer</p>
+            <p style={{ color: "#be833f" }}></p>
+          </div>
           <div className="buttons">
             <p>JavaScript</p>
             <p>React</p>
@@ -218,23 +314,30 @@ function App() {
         </div>
         <div className="canvas-container">
           <Canvas
-            camera={{ position: [0, 0, 0], fov: 75 }}
+            camera={{ position: [0, 0, 0], fov: 90 }}
             gl={{ powerPreference: "high-performance" }}
           >
+            {/* <color attach="background" args={["#adadad59"]} /> */}
+            <fog attach="fog" args={["#03040c", 10, 27]} />
             <Suspense>
               <ModelEarth />
               <ModelRat />
               <ModelShip />
               <ModelRing />
               <ModelRockPlanet />
-              <pointLight position={[1, 0, 1]} intensity={60} />
-              <ambientLight intensity={0.1} />
+              <directionalLight
+                position={[3, 1, 5]}
+                intensity={1}
+                color={"#f0e5c3"}
+              />
+
+              <ambientLight intensity={0.15} />
               <Stars
-                radius={100}
-                depth={50}
-                count={5000}
+                radius={350}
+                depth={20}
+                count={3000}
                 factor={5}
-                saturation={0}
+                saturation={1}
                 fade
               />
               {/* <Environment preset="dawn" background /> */}
@@ -261,4 +364,6 @@ export default App;
             //width: "150px",
           }}
         />
+
+        <span className="font-alt">{text}</span>
 */

@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap');
+@import url('https://fonts.cdnfonts.com/css/jetbrains-mono');
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
 
 .App {
   text-align: center;
@@ -17,7 +24,7 @@
 }
 
 .App-header {
-  background-color: #0f0f11;
+  background-color: #05050a;
   min-height: 100vh;
   position: relative;
   display: flex;
@@ -53,16 +60,17 @@
 
   width: 60vw;
   max-width: 754px;
-  background: linear-gradient(-45deg, #212527, #111314);
+  background-color: #0a0a0a;
+  /*background: linear-gradient(-45deg, #0e0e0e, #121212);*/
   
-  border-radius: 16px;
-  border: 3px solid rgb(10, 10, 10);
+  border-radius: 12px;
+  border: 3px solid rgb(155, 155, 155);
   user-select: none;
 }
 
 .welcome {
   width: 100%;
-  height: 50%;
+  height: 60%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,7 +81,7 @@
   margin-right: 20px;
   font-weight: 100;
   font-size: 3.5rem;
-  font-family: 'Josefin Sans', sans-serif;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .font-alt {
@@ -82,9 +90,22 @@
   color:#5eabbe
 }
 
+.underscore {
+  animation: blink 1s step-end infinite;
+}
+
 .description {
   width: 100%;
-  height: 30%;
+  height: 20%;
+  display: flex;
+}
+
+.description p {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 300;
+  font-family: 'Josefin Sans', sans-serif;
+  margin-left: 20px;
 }
 
 .buttons {
@@ -134,25 +155,4 @@
   right: 0%;
   margin-bottom: 30px;
   bottom: 0;
-}
-
-.App-header canvas {
-  position: absolute !important;
-  bottom: 0;
-  left: 0;
-  width: 300px;  /* adjust size as needed */
-  height: 300px; /* adjust size as needed */
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
