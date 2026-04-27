@@ -4,50 +4,78 @@ import githubIcon from "../Subtract(2).svg";
 import mailIcon from "../Subtract.svg";
 import planet from "../planetIMG.png";
 import { Suspense, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, OrbitControls, Environment, Stars } from "@react-three/drei";
 import "./App.css";
 import { useMemo } from "react";
 import { SkeletonUtils } from "three-stdlib";
 import { useEffect, useState } from "react";
+import * as THREE from "three";
 
-useGLTF.preload("/earth(5).glb");
+useGLTF.preload("/earth1.glb");
 
 function ModelEarth() {
-  //https://skfb.ly/6SNB8
-  const { scene } = useGLTF("/earth(5).glb");
+  const { scene } = useGLTF("/jorden.glb");
   const ref = useRef();
 
   const clonedScene = useMemo(() => SkeletonUtils.clone(scene), [scene]);
 
-  {
-    /*useEffect(() => {
-  clonedScene.traverse((child) => {
-    if (child.isMesh && child.material) {
-      child.material.onBeforeCompile = (shader) => {
-        shader.fragmentShader = shader.fragmentShader.replace(
-          "#include <dithering_fragment>",
-          `
-          #include <dithering_fragment>
-
-          float depth = gl_FragCoord.z / gl_FragCoord.w;
-          float fade = smoothstep(10.0, 40.0, depth);
-
-          vec3 gray = vec3(dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114)));
-          gl_FragColor.rgb = mix(gl_FragColor.rgb, gray, fade * 0.7);
-          gl_FragColor.rgb *= (1.0 - fade * 0.3);
-          `
-        );
-      };
-    }
-  });
-}, [clonedScene]);`*/
-  }
-
   useFrame(() => {
     if (ref.current) {
       ref.current.rotation.y =
-        (ref.current.rotation.y + 0.0005) % (Math.PI * 2);
+        (ref.current.rotation.y + 0.0001) % (Math.PI * 2);
+    }
+  });
+
+  return (
+    <group position={[-13, -13, -20]}>
+      <primitive
+        ref={ref}
+        object={clonedScene}
+        scale={0.15}
+        rotation={[-0.0, 4.5, 0.0]}
+      />
+
+      {/* ✨ Glow */}
+      <mesh scale={0.035}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <shaderMaterial
+          blending={THREE.AdditiveBlending}
+          side={THREE.BackSide}
+          transparent
+          uniforms={{
+            glowColor: { value: new THREE.Color("#4da6ff") },
+          }}
+          vertexShader={`
+            varying vec3 vNormal;
+            void main() {
+              vNormal = normalize(normalMatrix * normal);
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `}
+          fragmentShader={`
+            varying vec3 vNormal;
+            void main() {
+              float intensity = pow(0.6 - dot(vNormal, vec3(0,0,1.0)), 4.0);
+              gl_FragColor = vec4(0.3, 0.6, 1.0, 1.0) * intensity;
+            }
+          `}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+function ModelRat() {
+  //https://skfb.ly/6Tswr
+  const { scene } = useGLTF("/rat1.glb");
+  const ref = useRef();
+
+  const clonedScene = useMemo(() => SkeletonUtils.clone(scene), [scene]);
+
+  useFrame(() => {
+    if (ref.current) {
+      ref.current.rotation.y = (ref.current.rotation.y + 0.005) % (Math.PI * 2);
     }
   });
 
@@ -55,16 +83,41 @@ function ModelEarth() {
     <primitive
       ref={ref}
       object={clonedScene}
-      scale={0.02}
-      rotation={[0.0, 0, 0.2]}
-      position={[-11, 6, -20]}
+      scale={0.2}
+      rotation={[0.7, 0, 0.2]}
+      position={[2, 1.5, -7]}
     />
   );
 }
 
-function ModelRat() {
+function ModelSaturn() {
   //https://skfb.ly/6Tswr
-  const { scene } = useGLTF("/rat1.glb");
+  const { scene } = useGLTF("/MoonT1.glb");
+  const ref = useRef();
+
+  const clonedScene = useMemo(() => SkeletonUtils.clone(scene), [scene]);
+
+  useFrame(() => {
+    if (ref.current) {
+      ref.current.rotation.y =
+        (ref.current.rotation.y - 0.0002) % (Math.PI * 2);
+    }
+  });
+
+  return (
+    <primitive
+      ref={ref}
+      object={clonedScene}
+      scale={0.008}
+      rotation={[-0.1, 0, 0]}
+      position={[5, 1.5, -7]}
+    />
+  );
+}
+
+function ModelShuttle() {
+  //https://skfb.ly/6Tswr
+  const { scene } = useGLTF("/space_shuttle.glb");
   const ref = useRef();
 
   const clonedScene = useMemo(() => SkeletonUtils.clone(scene), [scene]);
@@ -121,7 +174,8 @@ function ModelRing() {
   useFrame(() => {
     if (ref.current) {
       //ref.current.position.y = -1.0 + Math.sin(Date.now() * 0.001) * 0.03;
-      ref.current.rotation.y = (ref.current.rotation.y + 0.002) % (Math.PI * 2);
+      ref.current.rotation.y =
+        (ref.current.rotation.y + 0.0005) % (Math.PI * 2);
     }
   });
 
@@ -132,7 +186,7 @@ function ModelRing() {
       scale={0.1}
       rotation={[0, 0, 0]}
       //rotation={[0.6, 1.3, -0.8]}
-      position={[-3.4, -2.0, -6]}
+      position={[-11, -4.0, -15]}
     />
   );
 }
@@ -147,7 +201,8 @@ function ModelRockPlanet() {
   useFrame(() => {
     if (ref.current) {
       //ref.current.position.y = -1.0 + Math.sin(Date.now() * 0.001) * 0.03;
-      ref.current.rotation.y = (ref.current.rotation.y + 0.001) % (Math.PI * 2);
+      ref.current.rotation.y =
+        (ref.current.rotation.y + 0.0002) % (Math.PI * 2);
     }
   });
 
@@ -157,9 +212,20 @@ function ModelRockPlanet() {
       object={clonedScene}
       scale={0.1}
       rotation={[0.0, 0.1, -0.4]}
-      position={[-3.4, -2.0, -6]}
+      position={[-11, -4.0, -15]}
     />
   );
+}
+
+function CameraLook() {
+  const { camera } = useThree();
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    camera.rotation.y = Math.sin(t * 0.1) * 0.07;
+  });
+
+  return null;
 }
 
 function App() {
@@ -201,59 +267,59 @@ function App() {
     }
   }, []);
 
-  const words = ["Welcome", "Developer", "UI Designer", "Creator"];
+  const words = ["Welcome", "Developer", "UI Designer", "Full Stack"];
 
-const [displayed, setDisplayed] = useState("");
-const [wordIndex, setWordIndex] = useState(0);
+  const [displayed, setDisplayed] = useState("");
+  const [wordIndex, setWordIndex] = useState(0);
 
   useEffect(() => {
-  let timeout;
-  let interval;
+    let timeout;
+    let interval;
 
-  const typeWord = (word) => {
-    let i = 0;
+    const typeWord = (word) => {
+      let i = 0;
 
-    interval = setInterval(() => {
-      setDisplayed(word.slice(0, i + 1));
-      i++;
+      interval = setInterval(() => {
+        setDisplayed(word.slice(0, i + 1));
+        i++;
 
-      if (i === word.length) {
-        clearInterval(interval);
+        if (i === word.length) {
+          clearInterval(interval);
 
-        // pause before deleting
-        timeout = setTimeout(() => deleteWord(word), 3000);
-      }
-    }, 120); // typing speed
-  };
+          // pause before deleting
+          timeout = setTimeout(() => deleteWord(word), 3000);
+        }
+      }, 120); // typing speed
+    };
 
-  const deleteWord = (word) => {
-    let i = word.length;
+    const deleteWord = (word) => {
+      let i = word.length;
 
-    interval = setInterval(() => {
-      setDisplayed(word.slice(0, i - 1));
-      i--;
+      interval = setInterval(() => {
+        setDisplayed(word.slice(0, i - 1));
+        i--;
 
-      if (i === 0) {
-        clearInterval(interval);
+        if (i === 0) {
+          clearInterval(interval);
 
-        const nextIndex = (wordIndex + 1) % words.length;
-        setWordIndex(nextIndex);
+          const nextIndex = (wordIndex + 1) % words.length;
+          setWordIndex(nextIndex);
 
-        timeout = setTimeout(() => typeWord(words[nextIndex]), 400);
-      }
-    }, 120); // delete speed (faster than typing)
-  };
+          timeout = setTimeout(() => typeWord(words[nextIndex]), 400);
+        }
+      }, 120); // delete speed (faster than typing)
+    };
 
-  // initial delay before first word starts
-  timeout = setTimeout(() => {
-    typeWord(words[wordIndex]);
-  }, 1000);
+    // initial delay before first word starts
+    timeout = setTimeout(() => {
+      typeWord(words[wordIndex]);
+    }, 1000);
 
-  return () => {
-    clearTimeout(timeout);
-    clearInterval(interval);
-  };
-}, [wordIndex]);
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
+  }, [wordIndex]);
 
   return (
     <div className="App">
@@ -261,21 +327,24 @@ const [wordIndex, setWordIndex] = useState(0);
         <div className="text-content">
           <div className="welcome">
             <h1>
+              Welcome
               <span className="font-main">
-                {displayed}
                 <span className="underscore">_</span>
               </span>
             </h1>
           </div>
           <div className="description">
-            <p style={{ color: "#4288c2" }}>Developer</p>
-            <p style={{ color: "#b34cb3" }}>UI Designer</p>
-            <p style={{ color: "#be833f" }}></p>
-          </div>
-          <div className="buttons">
-            <p>JavaScript</p>
-            <p>React</p>
-            <p>Node.js</p>
+            <p>
+              {">"} i'm Lukas
+            </p>
+            <p>
+              {">"} <span style={{ color: "#5eabbe" }}>{displayed}</span>
+            </p>
+            <p>
+              {">"} <span style={{ color: "#4288c2" }}>Developer</span>{" "}
+              <span style={{ color: "#b34cb3" }}>UI Designer</span>{" "}
+              <span style={{ color: "#d3934a" }}>Engineer</span>
+            </p>
           </div>
         </div>
         <div className="bottom-content">
@@ -317,25 +386,27 @@ const [wordIndex, setWordIndex] = useState(0);
             camera={{ position: [0, 0, 0], fov: 90 }}
             gl={{ powerPreference: "high-performance" }}
           >
-            {/* <color attach="background" args={["#adadad59"]} /> */}
-            <fog attach="fog" args={["#03040c", 10, 27]} />
+            <color attach="background" args={["#000000"]} />
+            <fog attach="fog" args={["#91bfdf", 1, 50]} />
             <Suspense>
+              {/* <CameraLook /> */}
               <ModelEarth />
               <ModelRat />
               <ModelShip />
               <ModelRing />
               <ModelRockPlanet />
+              <ModelSaturn />
               <directionalLight
-                position={[3, 1, 5]}
-                intensity={1}
-                color={"#f0e5c3"}
+                position={[2, 1.5, 5]}
+                intensity={2}
+                color={"#c3c8e6"}
               />
 
-              <ambientLight intensity={0.15} />
+              <ambientLight intensity={0.1} />
               <Stars
-                radius={350}
-                depth={20}
-                count={3000}
+                radius={300}
+                depth={300}
+                count={10000}
                 factor={5}
                 saturation={1}
                 fade
